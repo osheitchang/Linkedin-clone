@@ -5,40 +5,52 @@ import { login } from "./features/userSlice";
 import { useDispatch } from "react-redux";
 
 function Login() {
-
-const [email, setEmail] = useState("");
-const [password, setPassword] = useState("");
-const [name, setName] = useState("");
-const [profilePic, setProfilePic] = useState("");
-const dispatch = useDispatch();  
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [profilePic, setProfilePic] = useState("");
+  const dispatch = useDispatch();
 
   const loginToApp = (e) => {
+    e.preventDefault();
 
-      e.preventDefault();
-
+    auth.signInWithEmailAndPassword(email, password).then((userAuth) => {
+      dispatch(
+        login({
+          email: userAuth.user.email,
+          uid: userAuth.user.uid,
+          displayName: userAuth.displayName,
+          profileUrl: userAuth.user.photoURL,
+        })
+      );
+    }).catch(error => alert(error))
   };
 
-
   const register = () => {
-    if(!name){
-        return alert('Please enter Full Name')
-    }   
-    
-    auth.createUserWithEmailAndPassword(email,password).then((userAuth)=> {
-        userAuth.user.updateProfile({
-            displayName:name,
-            photoURL: profilePic,
-        })
-        .then(()=> {
-            dispatch(login({
-                 email: userAuth.user.email,
-                 uid: userAuth.user.uid,
-                 display: name,
-                 photoUrl: profilePic,
-            }))
-        })
-    }).catch(error => alert(error.message))
+    if (!name) {
+      return alert("Please enter Full Name");
+    }
 
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((userAuth) => {
+        userAuth.user
+          .updateProfile({
+            displayName: name,
+            photoURL: profilePic,
+          })
+          .then(() => {
+            dispatch(
+              login({
+                email: userAuth.user.email,
+                uid: userAuth.user.uid,
+                display: name,
+                photoUrl: profilePic,
+              })
+            );
+          });
+      })
+      .catch((error) => alert(error));
   };
 
   return (
@@ -50,21 +62,33 @@ const dispatch = useDispatch();
       <form>
         <input
           value={name}
-          onChange={e=> setName(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           placeholder="Full Name (required if registaring)"
           type="text"
         ></input>
 
         <input
           value={profilePic}
-          onChange={e=> setProfilePic(e.target.value)}
+          onChange={(e) => setProfilePic(e.target.value)}
           placeholder="Profile Picture URL (optional) "
           type="text"
         ></input>
 
-        <input value={email} onChange={ e => setEmail(e.target.value)} placeholder="Email" type="text"></input>
-        <input value= {password} onChange={e => setPassword(e.target.value)} placeholder="Password" type="password"></input>
-        <button type="submit" onClick={loginToApp}>Sign In</button>
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
+          type="text"
+        ></input>
+        <input
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          type="password"
+        ></input>
+        <button type="submit" onClick={loginToApp}>
+          Sign In
+        </button>
       </form>
 
       <p> Not a member?</p>
